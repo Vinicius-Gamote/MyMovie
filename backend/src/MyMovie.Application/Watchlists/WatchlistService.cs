@@ -39,14 +39,14 @@ public sealed class WatchlistService(
         var now = timeProvider.GetUtcNow();
         var watchlist = await repository.GetByOwnerAsync(ownerUserId, cancellationToken)
             ?? Watchlist.Create(ownerUserId, now);
+        var movie = new MovieReference("tmdb", movieId);
 
-        var added = watchlist.Add(new MovieReference("tmdb", movieId), now);
-        if (added)
+        if (!watchlist.Add(movie, now))
         {
-            await repository.SaveAsync(watchlist, cancellationToken);
+            return false;
         }
 
-        return added;
+        return await repository.AddMovieAsync(watchlist, movie, cancellationToken);
     }
 
     public async Task<bool> RemoveAsync(Guid ownerUserId, int movieId, CancellationToken cancellationToken)
@@ -57,13 +57,13 @@ public sealed class WatchlistService(
             return false;
         }
 
-        var removed = watchlist.Remove(new MovieReference("tmdb", movieId), timeProvider.GetUtcNow());
-        if (removed)
+        var movie = new MovieReference("tmdb", movieId);
+        if (!watchlist.Remove(movie, timeProvider.GetUtcNow()))
         {
-            await repository.SaveAsync(watchlist, cancellationToken);
+            return false;
         }
 
-        return removed;
+        return await repository.RemoveMovieAsync(watchlist, movie, cancellationToken);
     }
 
     private static MovieSummary ToSummary(MovieDetails details) => new(

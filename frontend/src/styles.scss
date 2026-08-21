@@ -53,6 +53,7 @@ app-root {
 img,
 picture,
 video {
+  height: auto;
   max-width: 100%;
 }
 .mat-icon {
@@ -76,23 +77,12 @@ a {
   margin: 0;
   font: var(--mat-sys-display-small);
   letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
 }
 .page-intro {
   max-width: 46rem;
   color: var(--mat-sys-on-surface-variant);
   font: var(--mat-sys-body-large);
-}
-.movie-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 16rem));
-  justify-content: center;
-  align-items: start;
-  gap: clamp(1rem, 2.2vw, 1.5rem);
-}
-.movie-grid > * {
-  width: 100%;
-  min-width: 0;
-  max-width: 16rem;
 }
 .centered-state {
   display: grid;
@@ -106,6 +96,26 @@ a {
 .centered-state h2,
 .centered-state p {
   margin: 0;
+}
+section,
+article,
+header,
+form,
+mat-card,
+mat-card-content,
+mat-form-field {
+  min-width: 0;
+  max-width: 100%;
+}
+@media (max-width: 600px) {
+  .page-heading {
+    font-size: clamp(2rem, 10vw, 2.75rem);
+    line-height: 1.05;
+  }
+  .centered-state {
+    min-height: 13rem;
+    padding-inline: 0;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   html {

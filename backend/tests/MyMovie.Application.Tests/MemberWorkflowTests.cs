@@ -26,6 +26,21 @@ public sealed class MemberWorkflowTests
     }
 
     [Fact]
+    public async Task Watchlist_AllowsManyDistinctMovies()
+    {
+        var repository = new FakeWatchlistRepository();
+        var service = new WatchlistService(repository, new FakeMovieProvider(), new FixedTimeProvider(Now));
+        var userId = Guid.NewGuid();
+
+        foreach (var movieId in Enumerable.Range(1, 100))
+        {
+            Assert.True(await service.AddAsync(userId, movieId, CancellationToken.None));
+        }
+
+        Assert.Equal(100, repository.Watchlist!.Entries.Count);
+    }
+
+    [Fact]
     public async Task Review_CreateRejectsDuplicateAuthorAndMovie()
     {
         var repository = new FakeReviewRepository();
@@ -65,7 +80,16 @@ public sealed class MemberWorkflowTests
     {
         public Watchlist? Watchlist { get; private set; }
         public Task<Watchlist?> GetByOwnerAsync(Guid ownerUserId, CancellationToken cancellationToken) => Task.FromResult(Watchlist);
-        public Task SaveAsync(Watchlist watchlist, CancellationToken cancellationToken) { Watchlist = watchlist; return Task.CompletedTask; }
+        public Task<bool> AddMovieAsync(Watchlist watchlist, MovieReference movie, CancellationToken cancellationToken)
+        {
+            Watchlist = watchlist;
+            return Task.FromResult(true);
+        }
+        public Task<bool> RemoveMovieAsync(Watchlist watchlist, MovieReference movie, CancellationToken cancellationToken)
+        {
+            Watchlist = watchlist;
+            return Task.FromResult(true);
+        }
     }
 
     private sealed class FakeMovieProvider : IMovieProvider

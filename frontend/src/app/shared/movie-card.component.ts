@@ -66,6 +66,12 @@ import { MovieSummary } from '../core/models';
     </mat-card>
   `,
   styles: `
+    :host {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      height: 100%;
+    }
     .movie-card {
       width: 100%;
       max-width: 16rem;

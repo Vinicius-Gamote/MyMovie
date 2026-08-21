@@ -27,14 +27,14 @@ import {
 import { ApiService } from '../../core/api.service';
 import { MovieSummary, ProblemDetails } from '../../core/models';
 import { FieldIconComponent } from '../../shared/field-icon.component';
-import { MovieCardComponent } from '../../shared/movie-card.component';
+import { MovieCarouselComponent } from '../../shared/movie-carousel.component';
 
 @Component({
   selector: 'app-search',
   imports: [
     ReactiveFormsModule,
     FieldIconComponent,
-    MovieCardComponent,
+    MovieCarouselComponent,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
@@ -63,7 +63,7 @@ import { MovieCardComponent } from '../../shared/movie-card.component';
       <mat-hint>Enter at least one character</mat-hint>
     </mat-form-field>
 
-    @if (loading()) {
+    @if (loading() && movies().length === 0) {
       <section class="centered-state" aria-live="polite">
         <mat-spinner diameter="44" />
         <p>Searching movies…</p>
@@ -84,14 +84,21 @@ import { MovieCardComponent } from '../../shared/movie-card.component';
       <p class="result-count" aria-live="polite">
         {{ totalResults() }} results for “{{ activeQuery() }}”
       </p>
-      <div class="movie-grid">
-        @for (movie of movies(); track movie.id) {
-          <app-movie-card [movie]="movie" />
-        }
-      </div>
+      <app-movie-carousel
+        [movies]="movies()"
+        [label]="'Search results for ' + activeQuery()"
+        (endReached)="loadMore()"
+      />
       @if (hasNextPage()) {
         <div class="load-more">
-          <button mat-stroked-button (click)="loadMore()">Load more results</button>
+          <button mat-stroked-button (click)="loadMore()" [disabled]="loading()">
+            @if (loading()) {
+              <mat-spinner diameter="20" />
+              Loading more results…
+            } @else {
+              Load more results
+            }
+          </button>
         </div>
       }
     } @else {
@@ -129,6 +136,10 @@ import { MovieCardComponent } from '../../shared/movie-card.component';
       display: grid;
       place-items: center;
       padding: 3rem;
+    }
+    .load-more mat-spinner {
+      display: inline-block;
+      margin-right: 0.5rem;
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

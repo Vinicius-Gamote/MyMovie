@@ -174,6 +174,7 @@ import { ReviewListComponent } from '../reviews/review-list.component';
       font: var(--mat-sys-display-large);
       line-height: 1;
       letter-spacing: -0.04em;
+      overflow-wrap: anywhere;
     }
     .tagline,
     .facts,
@@ -276,7 +277,11 @@ import { ReviewListComponent } from '../reviews/review-list.component';
         justify-self: center;
       }
       .summary h1 {
-        font: var(--mat-sys-display-medium);
+        font-size: clamp(2.25rem, 12vw, 3.25rem);
+        line-height: 1.02;
+      }
+      .summary > button {
+        width: 100%;
       }
     }
   `,

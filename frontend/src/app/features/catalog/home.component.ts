@@ -3,15 +3,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterLink } from '@angular/router';
-import { InfiniteScrollDirective } from '../../shared/infinite-scroll.directive';
-import { MovieCardComponent } from '../../shared/movie-card.component';
+import { MovieCarouselComponent } from '../../shared/movie-carousel.component';
 import { CatalogStore } from './catalog-store.service';
 
 @Component({
   selector: 'app-home',
   imports: [
-    MovieCardComponent,
-    InfiniteScrollDirective,
+    MovieCarouselComponent,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
@@ -36,11 +34,12 @@ import { CatalogStore } from './catalog-store.service';
           <h2 id="latest-title">Latest movies</h2>
           <span>{{ store.movies().length }} loaded</span>
         </div>
-        <div class="movie-grid">
-          @for (movie of store.movies(); track movie.id) {
-            <app-movie-card [movie]="movie" (opened)="store.rememberScroll()" />
-          }
-        </div>
+        <app-movie-carousel
+          [movies]="store.movies()"
+          label="Latest movies carousel"
+          (opened)="store.rememberScroll()"
+          (endReached)="store.loadMore()"
+        />
       </section>
     }
 
@@ -59,7 +58,7 @@ import { CatalogStore } from './catalog-store.service';
     }
 
     @if (store.movies().length > 0 && store.hasNextPage()) {
-      <div class="load-boundary" appInfiniteScroll (reached)="store.loadMore()">
+      <div class="load-boundary">
         <button mat-stroked-button (click)="store.loadMore()" [disabled]="store.loading()">
           @if (store.loading()) {
             <mat-spinner diameter="20" />
