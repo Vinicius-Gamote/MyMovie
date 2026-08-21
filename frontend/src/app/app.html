@@ -1,0 +1,54 @@
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<mat-toolbar class="app-toolbar">
+  <a class="brand" routerLink="/" aria-label="MyMovie home">
+    <mat-icon aria-hidden="true">◆</mat-icon>
+    <span>MyMovie</span>
+  </a>
+
+  <nav class="desktop-nav" aria-label="Primary navigation">
+    <a
+      mat-button
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      >Discover</a
+    >
+    <a mat-button routerLink="/search" routerLinkActive="active">Search</a>
+    @if (auth.isAuthenticated()) {
+      <a mat-button routerLink="/watchlist" routerLinkActive="active">Watchlist</a>
+    }
+    @if (auth.isAdministrator()) {
+      <a mat-button routerLink="/admin/reviews" routerLinkActive="active">Moderate</a>
+    }
+  </nav>
+
+  <span class="toolbar-spacer"></span>
+
+  <div class="account-actions">
+    @if (auth.user(); as user) {
+      <button mat-button [matMenuTriggerFor]="accountMenu">
+        <mat-icon aria-hidden="true">●</mat-icon>
+        <span class="account-name">{{ user.displayName }}</span>
+      </button>
+      <mat-menu #accountMenu="matMenu">
+        <button mat-menu-item (click)="auth.signOut()">
+          <mat-icon aria-hidden="true">↗</mat-icon>
+          <span>Sign out</span>
+        </button>
+      </mat-menu>
+    } @else {
+      <a mat-button routerLink="/sign-in">Sign in</a>
+      <a mat-flat-button routerLink="/register">Create account</a>
+    }
+  </div>
+</mat-toolbar>
+
+<main id="main-content" tabindex="-1">
+  <router-outlet />
+</main>
+
+<footer>
+  <p>Movie data and images provided by TMDB. MyMovie is not endorsed or certified by TMDB.</p>
+  <p>Built for accessible movie discovery.</p>
+</footer>

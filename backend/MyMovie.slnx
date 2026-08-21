@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MyMovie.Api/MyMovie.Api.csproj" />
+    <Project Path="src/MyMovie.Application/MyMovie.Application.csproj" />
+    <Project Path="src/MyMovie.Domain/MyMovie.Domain.csproj" />
+    <Project Path="src/MyMovie.Infrastructure/MyMovie.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MyMovie.Api.IntegrationTests/MyMovie.Api.IntegrationTests.csproj" />
+    <Project Path="tests/MyMovie.Application.Tests/MyMovie.Application.Tests.csproj" />
+    <Project Path="tests/MyMovie.Domain.Tests/MyMovie.Domain.Tests.csproj" />
+    <Project Path="tests/MyMovie.Infrastructure.IntegrationTests/MyMovie.Infrastructure.IntegrationTests.csproj" />
+  </Folder>
+</Solution>

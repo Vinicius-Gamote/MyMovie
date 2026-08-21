@@ -1,0 +1,122 @@
+@use '@angular/material' as mat;
+
+:root {
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$violet-palette,
+        theme-type: dark,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+  color-scheme: dark;
+  background: #090d18;
+}
+
+* {
+  box-sizing: border-box;
+}
+html {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 100%;
+  overflow-x: clip;
+  scroll-behavior: smooth;
+}
+body {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: clip;
+  color: var(--mat-sys-on-background);
+  background:
+    radial-gradient(
+      circle at 15% 0%,
+      color-mix(in srgb, var(--mat-sys-primary) 13%, transparent),
+      transparent 30rem
+    ),
+    #090d18;
+  font-family: Roboto, Arial, sans-serif;
+}
+app-root {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+img,
+picture,
+video {
+  max-width: 100%;
+}
+.mat-icon {
+  font-family: Arial, sans-serif;
+  font-feature-settings: normal;
+  font-style: normal;
+  text-transform: none;
+}
+a {
+  color: var(--mat-sys-primary);
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+:focus-visible {
+  outline: 3px solid var(--mat-sys-primary);
+  outline-offset: 3px;
+}
+.page-heading {
+  margin: 0;
+  font: var(--mat-sys-display-small);
+  letter-spacing: -0.03em;
+}
+.page-intro {
+  max-width: 46rem;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-large);
+}
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 16rem));
+  justify-content: center;
+  align-items: start;
+  gap: clamp(1rem, 2.2vw, 1.5rem);
+}
+.movie-grid > * {
+  width: 100%;
+  min-width: 0;
+  max-width: 16rem;
+}
+.centered-state {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  min-height: 16rem;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+.centered-state h2,
+.centered-state p {
+  margin: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Restore backend
+        run: dotnet restore backend/MyMovie.slnx
+      - name: Build backend
+        run: dotnet build backend/MyMovie.slnx --configuration Release --no-restore
+      - name: Test backend
+        run: dotnet test backend/MyMovie.slnx --configuration Release --no-build --logger trx
+      - name: Audit backend dependencies
+        run: dotnet list backend/MyMovie.slnx package --vulnerable --include-transitive
+      - name: Restore frontend
+        working-directory: frontend
+        run: npm ci
+      - name: Audit frontend dependencies
+        working-directory: frontend
+        run: npm audit --audit-level=high
+      - name: Test frontend
+        working-directory: frontend
+        run: npm test
+      - name: Install Playwright browser
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - name: Test critical browser journeys
+        working-directory: frontend
+        run: npm run e2e
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+      - name: Check frontend formatting
+        working-directory: frontend
+        run: npm run format:check
+      - name: Validate Docker Compose
+        run: TMDB_ACCESS_TOKEN=ci-placeholder docker compose -f deploy/compose/compose.yaml --profile full config --quiet
+      - name: Build Docker images
+        run: |
+          docker build -f deploy/docker/api.Dockerfile -t mymovie-api:${{ github.sha }} .
+          docker build -f deploy/docker/web.Dockerfile -t mymovie-web:${{ github.sha }} .
+      - name: Smoke test the disposable Docker stack
+        env:
+          TMDB_ACCESS_TOKEN: ci-placeholder
+          POSTGRES_PASSWORD: ci-local-only
+        run: |
+          docker compose -f deploy/compose/compose.yaml --profile full up --build --wait -d
+          curl --fail --retry 5 --retry-delay 2 http://localhost:5080/health/ready
+          curl --fail --retry 5 --retry-delay 2 http://localhost:4200/
+      - name: Remove disposable Docker resources
+        if: always()
+        env:
+          TMDB_ACCESS_TOKEN: ci-placeholder
+          POSTGRES_PASSWORD: ci-local-only
+        run: docker compose -f deploy/compose/compose.yaml --profile full down --volumes

@@ -1,0 +1,129 @@
+:host {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.skip-link {
+  position: fixed;
+  inset: 0 auto auto 1rem;
+  z-index: 1000;
+  padding: 0.75rem 1rem;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  transform: translateY(-120%);
+  transition: transform 120ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0.5rem);
+}
+
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  gap: 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--mat-sys-outline) 24%, transparent);
+  background: color-mix(in srgb, var(--mat-sys-surface) 92%, transparent);
+  backdrop-filter: blur(16px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-title-large);
+  text-decoration: none;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.desktop-nav {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.active {
+  background: var(--mat-sys-secondary-container);
+}
+
+.toolbar-spacer {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+main {
+  width: min(100% - 2rem, 90rem);
+  min-width: 0;
+  max-width: 100%;
+  margin-inline: auto;
+  padding-block: clamp(1.5rem, 4vw, 3rem);
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem max(1rem, calc((100% - 88rem) / 2));
+  border-top: 1px solid color-mix(in srgb, var(--mat-sys-outline) 24%, transparent);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+footer p {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .app-toolbar {
+    gap: 0.5rem;
+    padding-inline: 0.5rem;
+  }
+
+  .brand {
+    font: var(--mat-sys-title-medium);
+  }
+
+  .brand mat-icon {
+    flex: 0 0 auto;
+  }
+
+  .desktop-nav,
+  .account-name {
+    display: none;
+  }
+
+  .account-actions a:first-of-type {
+    display: none;
+  }
+
+  .account-actions a:last-of-type {
+    padding-inline: 0.75rem;
+    font-size: 0.78rem;
+  }
+
+  footer {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}
