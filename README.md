@@ -6,8 +6,6 @@
 
 MyMovie helps visitors discover their next movie and gives registered members a private space to build a watchlist and publish reviews. Movie metadata comes from TMDB through a protected backend integration; provider credentials are never exposed to the browser.
 
-The entire product, source code, interface, and documentation are written in English.
-
 ## At a glance
 
 MyMovie demonstrates the ability to design and deliver a complete web product rather than an isolated code sample:
@@ -144,8 +142,6 @@ TMDB_ACCESS_TOKEN=your-read-access-token
 POSTGRES_PASSWORD=local-development-only
 POSTGRES_PORT=5433
 ```
-
-The `.env` file is ignored by source control. Never commit a real TMDB token.
 
 ### 2. Start the complete application
 
