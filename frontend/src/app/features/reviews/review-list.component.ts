@@ -183,10 +183,13 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
       flex-wrap: wrap;
       align-items: start;
       gap: 1rem;
+      min-width: 0;
       padding-top: 1rem;
     }
     .review-text {
       flex: 1 1 28rem;
+      min-width: 0;
+      max-width: 100%;
     }
     form button[type='submit'] {
       margin-top: 0.25rem;
@@ -252,8 +255,23 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
       font-size: 3rem;
     }
     @media (max-width: 600px) {
+      .reviews-heading {
+        align-items: start;
+        flex-direction: column;
+      }
       .review-item header {
         flex-direction: column;
+      }
+      form > mat-form-field,
+      form > button[type='submit'] {
+        width: 100%;
+      }
+      .owner-actions,
+      .edit-actions {
+        flex-wrap: wrap;
+      }
+      .empty-reviews {
+        padding-inline: 0;
       }
     }
   `,

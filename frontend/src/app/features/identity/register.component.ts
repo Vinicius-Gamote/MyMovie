@@ -45,7 +45,7 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
         <mat-card-content>
           <form [formGroup]="form" (ngSubmit)="submit()">
             <mat-form-field appearance="outline" subscriptSizing="dynamic"
-              ><mat-label>Display name</mat-label><app-field-icon matPrefix icon="user" /> ><input
+              ><mat-label>Display name</mat-label><app-field-icon matPrefix icon="user" /><input
                 matInput
                 formControlName="displayName"
                 autocomplete="name"
@@ -53,7 +53,7 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
               /><mat-hint>Shown with your reviews</mat-hint></mat-form-field
             >
             <mat-form-field appearance="outline" subscriptSizing="dynamic"
-              ><mat-label>Email</mat-label><app-field-icon matPrefix icon="email" /> ><input
+              ><mat-label>Email</mat-label><app-field-icon matPrefix icon="email" /><input
                 matInput
                 type="email"
                 formControlName="email"
@@ -64,7 +64,7 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
               }
             </mat-form-field>
             <mat-form-field appearance="outline" subscriptSizing="dynamic"
-              ><mat-label>Password</mat-label><app-field-icon matPrefix icon="lock" /> ><input
+              ><mat-label>Password</mat-label><app-field-icon matPrefix icon="lock" /><input
                 matInput
                 type="password"
                 formControlName="password"
@@ -75,7 +75,7 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
             >
             <mat-form-field appearance="outline" subscriptSizing="dynamic"
               ><mat-label>Confirm password</mat-label
-              ><app-field-icon matPrefix icon="check" /> ><input
+              ><app-field-icon matPrefix icon="check" /><input
                 matInput
                 type="password"
                 formControlName="confirmPassword"

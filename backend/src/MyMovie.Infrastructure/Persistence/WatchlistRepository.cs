@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MyMovie.Application.Watchlists;
 using MyMovie.Domain.Catalog;
 using MyMovie.Domain.Watchlists;
+using Npgsql;
 
 namespace MyMovie.Infrastructure.Persistence;
 
@@ -26,45 +27,108 @@ public sealed class WatchlistRepository(AppDbContext dbContext) : IWatchlistRepo
                 entity.UpdatedAt);
     }
 
-    public async Task SaveAsync(Watchlist watchlist, CancellationToken cancellationToken)
+    public async Task<bool> AddMovieAsync(
+        Watchlist watchlist,
+        MovieReference movie,
+        CancellationToken cancellationToken)
     {
-        var entity = await dbContext.Watchlists
-            .Include(item => item.Entries)
-            .SingleOrDefaultAsync(item => item.Id == watchlist.Id, cancellationToken);
-
-        if (entity is null)
+        const int maximumAttempts = 2;
+        for (var attempt = 1; attempt <= maximumAttempts; attempt++)
         {
-            entity = new WatchlistEntity
-            {
-                Id = watchlist.Id,
-                OwnerUserId = watchlist.OwnerUserId,
-                CreatedAt = watchlist.CreatedAt,
-                UpdatedAt = watchlist.UpdatedAt
-            };
-            dbContext.Watchlists.Add(entity);
-        }
+            dbContext.ChangeTracker.Clear();
+            var entity = await dbContext.Watchlists
+                .SingleOrDefaultAsync(item => item.OwnerUserId == watchlist.OwnerUserId, cancellationToken);
 
-        entity.UpdatedAt = watchlist.UpdatedAt;
-        var desired = watchlist.Entries.ToDictionary(entry => entry.Movie);
-        entity.Entries.RemoveAll(entry => !desired.ContainsKey(new MovieReference(entry.Provider, entry.ProviderMovieId)));
-
-        foreach (var entry in watchlist.Entries)
-        {
-            if (entity.Entries.Any(item => item.Provider == entry.Movie.Provider && item.ProviderMovieId == entry.Movie.ProviderMovieId))
+            if (entity is null)
             {
-                continue;
+                entity = new WatchlistEntity
+                {
+                    Id = watchlist.Id,
+                    OwnerUserId = watchlist.OwnerUserId,
+                    CreatedAt = watchlist.CreatedAt,
+                    UpdatedAt = watchlist.UpdatedAt
+                };
+                dbContext.Watchlists.Add(entity);
+            }
+            else if (await dbContext.WatchlistEntries.AnyAsync(
+                entry =>
+                    entry.WatchlistId == entity.Id &&
+                    entry.Provider == movie.Provider &&
+                    entry.ProviderMovieId == movie.ProviderMovieId,
+                cancellationToken))
+            {
+                return false;
             }
 
-            entity.Entries.Add(new WatchlistEntryEntity
+            entity.UpdatedAt = watchlist.UpdatedAt;
+            dbContext.WatchlistEntries.Add(new WatchlistEntryEntity
             {
                 Id = Guid.NewGuid(),
-                WatchlistId = watchlist.Id,
-                Provider = entry.Movie.Provider,
-                ProviderMovieId = entry.Movie.ProviderMovieId,
-                CreatedAt = entry.CreatedAt
+                WatchlistId = entity.Id,
+                Provider = movie.Provider,
+                ProviderMovieId = movie.ProviderMovieId,
+                CreatedAt = watchlist.Entries.Single(entry => entry.Movie == movie).CreatedAt
             });
+
+            try
+            {
+                await dbContext.SaveChangesAsync(cancellationToken);
+                return true;
+            }
+            catch (DbUpdateException exception) when (IsUniqueViolation(exception) && attempt < maximumAttempts)
+            {
+                // Another request may have created the user's watchlist first.
+                // Clear the failed graph and retry against the persisted parent.
+            }
+            catch (DbUpdateException exception) when (IsUniqueViolation(exception))
+            {
+                return false;
+            }
         }
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        return false;
     }
+
+    public async Task<bool> RemoveMovieAsync(
+        Watchlist watchlist,
+        MovieReference movie,
+        CancellationToken cancellationToken)
+    {
+        dbContext.ChangeTracker.Clear();
+        var entity = await dbContext.Watchlists
+            .SingleOrDefaultAsync(item => item.OwnerUserId == watchlist.OwnerUserId, cancellationToken);
+        if (entity is null)
+        {
+            return false;
+        }
+
+        var entry = await dbContext.WatchlistEntries.SingleOrDefaultAsync(
+            item =>
+                item.WatchlistId == entity.Id &&
+                item.Provider == movie.Provider &&
+                item.ProviderMovieId == movie.ProviderMovieId,
+            cancellationToken);
+        if (entry is null)
+        {
+            return false;
+        }
+
+        dbContext.WatchlistEntries.Remove(entry);
+        entity.UpdatedAt = watchlist.UpdatedAt;
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return false;
+        }
+    }
+
+    private static bool IsUniqueViolation(DbUpdateException exception) =>
+        exception.InnerException is PostgresException
+        {
+            SqlState: PostgresErrorCodes.UniqueViolation
+        };
 }

@@ -6,6 +6,28 @@
     <span>MyMovie</span>
   </a>
 
+  <button
+    class="mobile-nav-trigger"
+    mat-icon-button
+    type="button"
+    aria-label="Open navigation"
+    [matMenuTriggerFor]="navigationMenu"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4 7h16M4 12h16M4 17h16" />
+    </svg>
+  </button>
+  <mat-menu #navigationMenu="matMenu">
+    <a mat-menu-item routerLink="/">Discover</a>
+    <a mat-menu-item routerLink="/search">Search</a>
+    @if (auth.isAuthenticated()) {
+      <a mat-menu-item routerLink="/watchlist">Watchlist</a>
+    }
+    @if (auth.isAdministrator()) {
+      <a mat-menu-item routerLink="/admin/reviews">Moderate</a>
+    }
+  </mat-menu>
+
   <nav class="desktop-nav" aria-label="Primary navigation">
     <a
       mat-button

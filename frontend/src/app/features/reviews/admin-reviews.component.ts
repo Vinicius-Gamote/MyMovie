@@ -140,6 +140,19 @@ import { ModerationDialogComponent } from './moderation-dialog.component';
       height: 3rem;
       font-size: 3rem;
     }
+    @media (max-width: 600px) {
+      mat-form-field {
+        width: 100%;
+      }
+      .queue article > header {
+        align-items: start;
+        flex-direction: column;
+      }
+      .actions,
+      .actions button {
+        width: 100%;
+      }
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

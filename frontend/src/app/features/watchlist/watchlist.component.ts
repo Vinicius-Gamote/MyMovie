@@ -1,18 +1,25 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../core/api.service';
-import { WatchlistItem } from '../../core/models';
-import { MovieCardComponent } from '../../shared/movie-card.component';
+import { MovieSummary, WatchlistItem } from '../../core/models';
+import { MovieCarouselComponent } from '../../shared/movie-carousel.component';
 
 @Component({
   selector: 'app-watchlist',
   imports: [
     RouterLink,
-    MovieCardComponent,
+    MovieCarouselComponent,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
@@ -43,19 +50,12 @@ import { MovieCardComponent } from '../../shared/movie-card.component';
         <a mat-flat-button routerLink="/">Discover movies</a>
       </section>
     } @else {
-      <div class="movie-grid">
-        @for (item of items(); track item.movie.id) {
-          <div class="saved-movie">
-            <app-movie-card [movie]="item.movie" /><button
-              mat-stroked-button
-              (click)="remove(item)"
-              [attr.aria-label]="'Remove ' + item.movie.title + ' from watchlist'"
-            >
-              <mat-icon aria-hidden="true">−</mat-icon>Remove
-            </button>
-          </div>
-        }
-      </div>
+      <app-movie-carousel
+        [movies]="movies()"
+        label="Watchlist carousel"
+        [allowRemoval]="true"
+        (removeRequested)="remove($event)"
+      />
     }
   `,
   styles: `
@@ -67,14 +67,6 @@ import { MovieCardComponent } from '../../shared/movie-card.component';
       color: var(--mat-sys-primary);
       font: var(--mat-sys-label-large);
       letter-spacing: 0.15em;
-    }
-    .saved-movie {
-      display: grid;
-      gap: 0.75rem;
-      align-content: start;
-    }
-    .saved-movie > button {
-      justify-self: stretch;
     }
     .centered-state > mat-icon {
       width: 4rem;
@@ -88,6 +80,7 @@ export class WatchlistComponent implements OnInit {
   private readonly api = inject(ApiService);
   private readonly snackBar = inject(MatSnackBar);
   protected readonly items = signal<WatchlistItem[]>([]);
+  protected readonly movies = computed(() => this.items().map((item) => item.movie));
   protected readonly loading = signal(true);
   protected readonly error = signal(false);
   ngOnInit(): void {
@@ -107,13 +100,11 @@ export class WatchlistComponent implements OnInit {
       },
     });
   }
-  remove(item: WatchlistItem): void {
-    this.api.removeFromWatchlist(item.movie.id).subscribe({
+  remove(movie: MovieSummary): void {
+    this.api.removeFromWatchlist(movie.id).subscribe({
       next: () => {
-        this.items.update((items) =>
-          items.filter((candidate) => candidate.movie.id !== item.movie.id),
-        );
-        this.snackBar.open(`${item.movie.title} was removed.`, 'Close', { duration: 3500 });
+        this.items.update((items) => items.filter((candidate) => candidate.movie.id !== movie.id));
+        this.snackBar.open(`${movie.title} was removed.`, 'Close', { duration: 3500 });
       },
       error: () =>
         this.snackBar.open('The movie could not be removed.', 'Close', { duration: 3500 }),

@@ -35,7 +35,7 @@ import { FieldIconComponent } from '../../shared/field-icon.component';
         <mat-card-content>
           <form [formGroup]="form" (ngSubmit)="submit()">
             <mat-form-field appearance="outline" subscriptSizing="dynamic"
-              ><mat-label>Email</mat-label><app-field-icon matPrefix icon="email" /> ><input
+              ><mat-label>Email</mat-label><app-field-icon matPrefix icon="email" /><input
                 matInput
                 type="email"
                 formControlName="email"
@@ -46,7 +46,7 @@ import { FieldIconComponent } from '../../shared/field-icon.component';
               }
             </mat-form-field>
             <mat-form-field appearance="outline" subscriptSizing="dynamic"
-              ><mat-label>Password</mat-label><app-field-icon matPrefix icon="lock" /> ><input
+              ><mat-label>Password</mat-label><app-field-icon matPrefix icon="lock" /><input
                 matInput
                 type="password"
                 formControlName="password"
